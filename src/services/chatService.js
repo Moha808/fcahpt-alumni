@@ -63,7 +63,7 @@ export const sendPrivateMessage = async (currentUserId, currentUserName, targetU
 
 // Listen to group messages in real-time
 export const subscribeToGroupMessages = (courseName, callback) => {
-  const sanitizedCourse = courseName.replace(/[^a-zA-Z0-9]/g, '_');
+  const sanitizedCourse = (courseName || 'General').replace(/[^a-zA-Z0-9]/g, '_');
   const messagesRef = collection(db, 'groups', sanitizedCourse, 'messages');
   const q = query(messagesRef, orderBy('createdAt', 'asc'), limit(100));
 
@@ -73,6 +73,22 @@ export const subscribeToGroupMessages = (courseName, callback) => {
       ...doc.data()
     }));
     callback(messages);
+  }, (error) => {
+    console.error('Error in group message listener:', error);
+    // If index is missing, fall back to unordered fetch
+    if (error.code === 'failed-precondition') {
+      const fallbackQ = query(messagesRef, limit(100));
+      onSnapshot(fallbackQ, (snapshot) => {
+        const messages = snapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() ?? 0;
+            const bTime = b.createdAt?.toMillis?.() ?? 0;
+            return aTime - bTime;
+          });
+        callback(messages);
+      });
+    }
   });
 };
 
@@ -88,5 +104,20 @@ export const subscribeToPrivateMessages = (currentUserId, targetUserId, callback
       ...doc.data()
     }));
     callback(messages);
+  }, (error) => {
+    console.error('Error in private message listener:', error);
+    if (error.code === 'failed-precondition') {
+      const fallbackQ = query(messagesRef, limit(100));
+      onSnapshot(fallbackQ, (snapshot) => {
+        const messages = snapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() ?? 0;
+            const bTime = b.createdAt?.toMillis?.() ?? 0;
+            return aTime - bTime;
+          });
+        callback(messages);
+      });
+    }
   });
 };
