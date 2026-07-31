@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #15803d; /* Rich green for agriculture/nature vibe */
+  --color-primary-hover: #166534;
+  --color-secondary: #047857;
+  --color-accent: #f59e0b; /* Earthy amber/yellow */
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  
+  --font-sans: "Inter", "Roboto", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+  }
+}
+
+/* Custom micro-animations & utilities */
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-green-700 to-emerald-500;
+  }
+}
