@@ -14,16 +14,26 @@ export default function Login() {
   const { login, loginWithGoogle, currentUser } = useAuth();
   const navigate = useNavigate();
 
-  // Handle redirect securely after Firebase updates the user state
+  // Handle redirect after login — wait until Firestore data is merged into currentUser
   useEffect(() => {
-    if (currentUser) {
-      if (!currentUser.role && !currentUser.isAdmin) {
-        navigate('/complete-profile');
-      } else if (currentUser.status === 'pending' && !currentUser.isAdmin) {
-        navigate('/pending');
-      } else {
-        navigate('/directory');
-      }
+    if (!currentUser) return;
+
+    // currentUser from AuthContext merges Firebase Auth + Firestore doc.
+    // 'uid' is always present. We also check for the Firestore-specific fields
+    // (role, status, isAdmin) to confirm the merge has happened.
+    const hasFirestoreData = currentUser.role !== undefined || currentUser.isAdmin !== undefined || currentUser.status !== undefined;
+
+    // If Firestore data hasn't loaded into the user object yet, wait.
+    if (!hasFirestoreData) return;
+
+    if (currentUser.isAdmin) {
+      navigate('/admin');
+    } else if (!currentUser.role) {
+      navigate('/complete-profile');
+    } else if (currentUser.status === 'pending') {
+      navigate('/pending');
+    } else {
+      navigate('/jobs');
     }
   }, [currentUser, navigate]);
 

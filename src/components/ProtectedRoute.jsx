@@ -8,8 +8,13 @@ export default function ProtectedRoute({ children, requireAlumni = false, ignore
     return <Navigate to="/login" replace />;
   }
 
+  // Admins always bypass all role/status checks
+  if (currentUser.isAdmin) {
+    return children;
+  }
+
   // If the user has no role defined, they need to complete their profile setup first
-  if (!ignoreRole && !currentUser.role && !currentUser.isAdmin) {
+  if (!ignoreRole && !currentUser.role) {
     return <Navigate to="/complete-profile" replace />;
   }
 
@@ -19,7 +24,7 @@ export default function ProtectedRoute({ children, requireAlumni = false, ignore
   }
 
   // Block non-alumni (like students) from accessing alumni-only routes (like Directory)
-  if (requireAlumni && currentUser.role !== 'alumni' && !currentUser.isAdmin) {
+  if (requireAlumni && currentUser.role !== 'alumni') {
     return <Navigate to="/" replace />;
   }
 
