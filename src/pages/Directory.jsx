@@ -15,30 +15,19 @@ export default function Directory() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
-  // Mock data to use until Firebase is connected and populated
-  const mockAlumni = [
-    { id: '1', displayName: 'Aisha Mohammed', course: 'Animal Health and Production', graduationYear: '2020', currentProfession: 'Veterinary Officer at state clinic', location: 'Jos, Plateau' },
-    { id: '2', displayName: 'David Okafor', course: 'Fisheries Technology', graduationYear: '2018', currentProfession: 'Aquaculture Consultant', location: 'Lagos' },
-    { id: '3', displayName: 'Sarah Ibrahim', course: 'Science Laboratory Technology', graduationYear: '2022', currentProfession: 'Lab Technician', location: 'Abuja' },
-    { id: '4', displayName: 'Chuks Nnaji', course: 'Animal Health and Production', graduationYear: '2015', currentProfession: 'Farm Manager', location: 'Kaduna' },
-    { id: '5', displayName: 'Zainab Bello', course: 'Environmental Health Technology', graduationYear: '2021', currentProfession: 'Health Inspector', location: 'Kano' },
-    { id: '6', displayName: 'Emeka Udo', course: 'Computer Science', graduationYear: '2019', currentProfession: 'Software Engineer', location: 'Port Harcourt' },
-  ];
-
   useEffect(() => {
     async function fetchAlumni() {
       try {
         const querySnapshot = await getDocs(collection(db, 'users'));
         if (querySnapshot.empty) {
-          // Fallback to mock data if DB is empty or not configured properly yet
-          setAlumni(mockAlumni);
+          setAlumni([]);
         } else {
           const usersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setAlumni(usersData);
         }
       } catch (error) {
         console.error("Error fetching alumni:", error);
-        setAlumni(mockAlumni); // Fallback on error (e.g. permission denied or wrong API keys)
+        setAlumni([]);
       } finally {
         setLoading(false);
       }
@@ -46,7 +35,6 @@ export default function Directory() {
 
     fetchAlumni();
   }, []);
-
   const filteredAlumni = alumni.filter(person => {
     const matchesSearch = person.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           person.currentProfession?.toLowerCase().includes(searchTerm.toLowerCase());

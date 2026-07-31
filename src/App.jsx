@@ -14,6 +14,7 @@ import Admin from './pages/Admin';
 import AdminRoute from './components/AdminRoute';
 import ProtectedRoute from './components/ProtectedRoute';
 import Pending from './pages/Pending';
+import CompleteProfile from './pages/CompleteProfile';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/pending" element={<Pending />} />
+            <Route path="/complete-profile" element={<ProtectedRoute ignoreRole={true}><CompleteProfile /></ProtectedRoute>} />
             
             {/* Protected Routes (Requires Login & Approval) */}
             <Route path="/directory" element={<ProtectedRoute requireAlumni={true}><Directory /></ProtectedRoute>} />

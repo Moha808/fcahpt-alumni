@@ -14,8 +14,8 @@ export default function Navbar() {
     { name: 'Events', path: '/events', icon: Calendar },
   ];
 
-  // Show directory for unauthenticated users, or authenticated users who are not students
-  if (!currentUser || currentUser.role !== 'student') {
+  // Show directory for unauthenticated users, or authenticated users who are alumni/admin
+  if (!currentUser || currentUser.role === 'alumni' || currentUser.isAdmin) {
     navLinks.unshift({ name: 'Directory', path: '/directory', icon: Users });
   }
   

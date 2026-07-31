@@ -16,7 +16,9 @@ export default function Login() {
   // Handle redirect securely after Firebase updates the user state
   useEffect(() => {
     if (currentUser) {
-      if (currentUser.status === 'pending' && !currentUser.isAdmin) {
+      if (!currentUser.role && !currentUser.isAdmin) {
+        navigate('/complete-profile');
+      } else if (currentUser.status === 'pending' && !currentUser.isAdmin) {
         navigate('/pending');
       } else {
         navigate('/directory');
