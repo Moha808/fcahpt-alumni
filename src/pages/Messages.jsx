@@ -18,7 +18,7 @@ export default function Messages() {
   const [searchParams] = useSearchParams();
   const initialUserId = searchParams.get('user');
 
-  const [activeChat, setActiveChat] = useState(initialUserId ? { type: 'private', id: initialUserId } : { type: 'group', id: currentUser?.course || 'General' });
+  const [activeChat, setActiveChat] = useState(initialUserId ? { type: 'private', id: initialUserId } : { type: 'group', id: 'General' });
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [allUsers, setAllUsers] = useState([]);
@@ -139,28 +139,53 @@ export default function Messages() {
         </div>
         
         <div className="overflow-y-auto flex-grow">
-          {/* Group Chat */}
+          {/* Group Chats */}
           <div className="p-3">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Your Course Group</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Group Chats</p>
+            
+            {/* General Chat */}
             <button
               onClick={() => {
-                setActiveChat({ type: 'group', id: currentUser.course || 'General' });
+                setActiveChat({ type: 'group', id: 'General' });
                 setIsChatOpenMobile(true);
               }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                activeChat.type === 'group' ? 'bg-green-50 border border-green-100' : 'hover:bg-slate-50 border border-transparent'
+                activeChat.type === 'group' && activeChat.id === 'General' ? 'bg-green-50 border border-green-100' : 'hover:bg-slate-50 border border-transparent'
               }`}
             >
               <div className="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
                 <Users className="w-5 h-5" />
               </div>
               <div className="text-left flex-grow truncate">
-                <p className={`font-semibold truncate ${activeChat.type === 'group' ? 'text-green-800' : 'text-slate-700'}`}>
-                  {currentUser.course || 'General Alumni'}
+                <p className={`font-semibold truncate ${activeChat.type === 'group' && activeChat.id === 'General' ? 'text-green-800' : 'text-slate-700'}`}>
+                  General Chat
                 </p>
-                <p className="text-xs text-slate-500 truncate">Course Group Chat</p>
+                <p className="text-xs text-slate-500 truncate">All Alumni & Students</p>
               </div>
             </button>
+
+            {/* Course Chat (Only if user has a course) */}
+            {currentUser.course && (
+              <button
+                onClick={() => {
+                  setActiveChat({ type: 'group', id: currentUser.course });
+                  setIsChatOpenMobile(true);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 mt-1 rounded-xl transition-colors ${
+                  activeChat.type === 'group' && activeChat.id === currentUser.course ? 'bg-blue-50 border border-blue-100' : 'hover:bg-slate-50 border border-transparent'
+                }`}
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div className="text-left flex-grow truncate">
+                  <p className={`font-semibold truncate ${activeChat.type === 'group' && activeChat.id === currentUser.course ? 'text-blue-800' : 'text-slate-700'}`}>
+                    {currentUser.course}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate">Course Group Chat</p>
+                </div>
+              </button>
+            )}
           </div>
 
           <div className="px-6 py-2">

@@ -37,6 +37,30 @@ export default function Events() {
     }
   };
 
+  const getGoogleCalendarUrl = (event) => {
+    const text = encodeURIComponent(event.title || 'Event');
+    const details = encodeURIComponent(event.description || '');
+    const location = encodeURIComponent(event.location || '');
+    
+    let dates = '';
+    try {
+      // Best effort date parsing
+      const startDate = new Date(`${event.date} ${event.time.split('-')[0] || ''}`);
+      const endDate = event.time.includes('-') 
+        ? new Date(`${event.date} ${event.time.split('-')[1]}`) 
+        : new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // add 2 hours if no end time
+        
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        const format = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, '');
+        dates = `&dates=${format(startDate)}/${format(endDate)}`;
+      }
+    } catch(e) {
+      console.error("Error parsing date for calendar", e);
+    }
+  
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&details=${details}&location=${location}${dates}`;
+  };
+
   // Fetch events from Firestore
   useEffect(() => {
     async function fetchEvents() {
@@ -244,13 +268,15 @@ export default function Events() {
                           >
                             Register Now
                           </button>
-                          <button 
-                            onClick={() => alert("Event details added to calendar.")}
+                          <a 
+                            href={getGoogleCalendarUrl(event)}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="px-4 py-2.5 text-slate-600 font-medium hover:text-green-600 transition-colors flex items-center gap-2"
                           >
                             <Calendar className="w-4 h-4" />
                             Add to Calendar
-                          </button>
+                          </a>
                         </div>
                       </div>
                     </div>
